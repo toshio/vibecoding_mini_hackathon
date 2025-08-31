@@ -1,0 +1,21 @@
+# Hardhat artifacts & cache
+/artifacts
+/cache
+/coverage
+/coverage.json
+/typechain
+/node_modules
+
+# Environment variables
+.env
+.env.*
+
+# Local development files
+*.log
+*.sqlite
+
+# Testing files
+mochawesome-report
+
+# Hardhat specific files (if you have them)
+hardhat-verify.json

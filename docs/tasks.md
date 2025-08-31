@@ -3,20 +3,20 @@
 ## フェーズ 1: プロジェクト基盤とスマートコントラクト開発
 
 - [✅] 要件定義と設計書の作成・更新
-- [⬜] **スマートコントラクト開発環境のセットアップ**
-  - [⬜] 開発フレームワークの決定 (Hardhat / Foundry)
-  - [⬜] プロジェクトの初期化と依存関係のインストール
-- [⬜] **スマートコントラクトの実装 (`FileAuthenticityVerification.sol`)**
-  - [⬜] 状態変数 (`records`, `signers`) の定義
-  - [⬜] イベント (`RecordStored`, `SignatureAdded`) の定義
-  - [⬜] `storeHash` 関数の実装
-  - [⬜] `addSignature` 関数の実装
-  - [⬜] `view`関数 (`getOwner`, `hasSigned`) の実装
-- [⬜] **スマートコントラクトのテスト**
-  - [⬜] `storeHash` 関数の単体テスト作成
-  - [⬜] `addSignature` 関数の単体テスト作成
-  - [⬜] エッジケース（二重登録、二重署名など）のテスト作成
-- [⬜] **スマートコントラクトのデプロイ**
+- [✅] **スマートコントラクト開発環境のセットアップ**
+  - [✅] 開発フレームワークの決定 (Hardhat)
+  - [✅] プロジェクトの初期化と依存関係のインストール
+- [✅] **スマートコントラクトの実装 (`FileAuthenticityVerification.sol`)**
+  - [✅] 状態変数 (`records`, `signers`) の定義
+  - [✅] イベント (`RecordStored`, `SignatureAdded`) の定義
+  - [✅] `storeHash` 関数の実装
+  - [✅] `addSignature` 関数の実装
+  - [✅] `view`関数 (`getOwner`, `hasSigned`) の実装
+- [✅] **スマートコントラクトのテスト**
+  - [✅] `storeHash` 関数の単体テスト作成
+  - [✅] `addSignature` 関数の単体テスト作成
+  - [✅] エッジケース（二重登録、二重署名など）のテスト作成
+- [📝] **スマートコントラクトのデプロイ**
   - [⬜] デプロイスクリプトの作成
   - [⬜] Base Sepolia テストネットへのデプロイ
   - [⬜] BasescanでのコントラクトVerify

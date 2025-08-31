@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "test:contracts": "cd hardhat && npx hardhat test ./test/FileAuthenticityVerification.ts"
   },
   "dependencies": {
     "@coinbase/onchainkit": "latest",
