@@ -1,0 +1,15 @@
+{
+ "name": "vibecoding_mini_hackathon",
+ "build": {
+  "dockerfile": "./Dockerfile",
+  "context": ".."
+ },
+ "remoteUser": "node",
+ "customizations": {
+  "vscode": {
+   "extensions": [
+    "google.gemini-code-assist"
+   ]
+  }
+ }
+}
