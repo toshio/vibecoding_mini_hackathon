@@ -10,9 +10,10 @@ type SignButtonProps = {
   owner: string | null | undefined;
   onSuccess: (txHash: string) => void;
   onError: (error: string) => void;
+  status: 'enabled' | 'is_owner' | 'already_verified' | 'no_owner';
 };
 
-export default function SignButton({ hash, owner, onSuccess, onError }: SignButtonProps) {
+export default function SignButton({ hash, owner, onSuccess, onError, status }: SignButtonProps) {
   const { signMessageAsync } = useSignMessage();
   const { writeContract, isPending } = useWriteContract();
 
@@ -27,7 +28,7 @@ export default function SignButton({ hash, owner, onSuccess, onError }: SignButt
     }
 
     try {
-      const signature = await signMessageAsync({ message: hash });
+      const signature = await signMessageAsync({ message: { raw: hash as `0x${string}` } });
 
       writeContract({
         address: CONTRACT_ADDRESS as `0x${string}`,
@@ -44,18 +45,31 @@ export default function SignButton({ hash, owner, onSuccess, onError }: SignButt
     }
   };
 
-  // 記録が存在しない場合はボタンを表示しない
-  if (!owner || owner === '0x0000000000000000000000000000000000000000') {
+  if (status === 'no_owner') {
     return null;
   }
+
+  const isDisabled = status !== 'enabled' || !hash || isPending;
+
+  const getButtonText = () => {
+    if (isPending) return 'Signing...';
+    switch (status) {
+      case 'is_owner':
+        return 'Owner Cannot Verify';
+      case 'already_verified':
+        return 'Already Verified';
+      default:
+        return 'Sign & Add as a Verifier';
+    }
+  };
 
   return (
     <button
       onClick={handleSignAndRecord}
-      disabled={!hash || isPending}
+      disabled={isDisabled}
       className="mt-4 w-full bg-purple-600 hover:bg-purple-700 disabled:bg-gray-500 text-white font-bold py-3 px-4 rounded-lg transition-colors duration-300"
     >
-      {isPending ? 'Signing...' : 'Sign & Add as a Verifier'}
+      {getButtonText()}
     </button>
   );
 }

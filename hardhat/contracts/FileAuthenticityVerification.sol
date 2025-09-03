@@ -15,6 +15,10 @@ contract FileAuthenticityVerification {
     // This tracks which addresses have attested to a specific hash.
     mapping(bytes32 => mapping(address => bool)) public signers;
 
+    // Mapping from a data hash to a list of signer addresses.
+    // This provides an iterable list of verifiers for a hash.
+    mapping(bytes32 => address[]) public signerList;
+
     /**
      * @dev Emitted when a new file hash is successfully recorded.
      * @param dataHash The hash of the file that was recorded.
@@ -56,6 +60,7 @@ contract FileAuthenticityVerification {
         require(!signers[dataHash][signerAddress], "Error: Address has already signed.");
 
         signers[dataHash][signerAddress] = true;
+        signerList[dataHash].push(signerAddress);
         emit SignatureAdded(dataHash, signerAddress);
     }
 
@@ -66,6 +71,15 @@ contract FileAuthenticityVerification {
      */
     function getOwner(bytes32 dataHash) public view returns (address) {
         return records[dataHash];
+    }
+
+    /**
+     * @dev Gets the list of signers for a given file hash.
+     * @param dataHash The hash to query.
+     * @return An array of addresses that have signed.
+     */
+    function getSigners(bytes32 dataHash) public view returns (address[] memory) {
+        return signerList[dataHash];
     }
 
     /**

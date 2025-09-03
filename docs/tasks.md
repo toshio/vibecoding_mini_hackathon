@@ -7,19 +7,20 @@
   - [✅] 開発フレームワークの決定 (Hardhat)
   - [✅] プロジェクトの初期化と依存関係のインストール
 - [✅] **スマートコントラクトの実装 (`FileAuthenticityVerification.sol`)**
-  - [✅] 状態変数 (`records`, `signers`) の定義
+  - [✅] 状態変数 (`records`, `signers`, `signerList`) の定義
   - [✅] イベント (`RecordStored`, `SignatureAdded`) の定義
   - [✅] `storeHash` 関数の実装
-  - [✅] `addSignature` 関数の実装
-  - [✅] `view`関数 (`getOwner`, `hasSigned`) の実装
+  - [✅] `addSignature` 関数の実装 (署名者リストへの追加含む)
+  - [✅] `view`関数 (`getOwner`, `hasSigned`, `getSigners`) の実装
 - [✅] **スマートコントラクトのテスト**
   - [✅] `storeHash` 関数の単体テスト作成
   - [✅] `addSignature` 関数の単体テスト作成
+  - [✅] `getSigners` 関数の単体テスト作成
   - [✅] エッジケース（二重登録、二重署名など）のテスト作成
-- [📝] **スマートコントラクトのデプロイ**
-  - [⬜] デプロイスクリプトの作成
-  - [⬜] Base Sepolia テストネットへのデプロイ
-  - [⬜] BasescanでのコントラクトVerify
+- [✅] **スマートコントラクトのデプロイ**
+  - [✅] デプロイスクリプトの作成
+  - [✅] Base Sepolia テストネットへのデプロイ
+  - [✅] BasescanでのコントラクトVerify
 
 ## フェーズ 2: フロントエンド開発
 
@@ -37,6 +38,7 @@
 - [⬜] **検証＆第三者署名機能の実装**
   - [⬜] 検証用の`FileUpload`コンポーネントをメインページに配置
   - [⬜] `getOwner`や`hasSigned`を呼び出し、検証結果を表示するUIの実装
+  - [⬜] `getSigners`を呼び出し、署名者一覧を表示するUIの実装
   - [⬜] `addSignature`関数を呼び出す`SignButton`コンポーネントの実装
   - [⬜] 検証・署名アクションに対するUIフィードバックの実装
 - [⬜] **UI/UXの磨き込み**

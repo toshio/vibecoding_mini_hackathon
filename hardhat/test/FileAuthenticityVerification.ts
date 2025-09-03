@@ -106,4 +106,38 @@ describe("FileAuthenticityVerification", function () {
         .to.be.revertedWith("Error: Address has already signed.");
     });
   });
+
+  describe("getSigners", function () {
+    it("Should return a list of all signer addresses for a hash", async function () {
+      const { contract, owner, otherAccount, thirdAccount, testFileHash } = await loadFixture(deployFixture);
+      await contract.connect(owner).storeHash(testFileHash);
+
+      const signatureOther = await otherAccount.signMessage(ethers.getBytes(testFileHash));
+      await contract.connect(otherAccount).addSignature(testFileHash, signatureOther);
+
+      const signatureThird = await thirdAccount.signMessage(ethers.getBytes(testFileHash));
+      await contract.connect(thirdAccount).addSignature(testFileHash, signatureThird);
+
+      const signers = await contract.getSigners(testFileHash);
+      
+      expect(signers).to.have.lengthOf(2);
+      expect(signers).to.include(otherAccount.address);
+      expect(signers).to.include(thirdAccount.address);
+    });
+
+    it("Should return an empty list for a hash with no signers", async function () {
+      const { contract, owner, testFileHash } = await loadFixture(deployFixture);
+      await contract.connect(owner).storeHash(testFileHash);
+
+      const signers = await contract.getSigners(testFileHash);
+      expect(signers).to.have.lengthOf(0);
+    });
+
+    it("Should return an empty list for a non-existent hash", async function () {
+      const { contract, nonExistentHash } = await loadFixture(deployFixture);
+
+      const signers = await contract.getSigners(nonExistentHash);
+      expect(signers).to.have.lengthOf(0);
+    });
+  });
 });

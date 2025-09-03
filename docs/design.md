@@ -50,6 +50,10 @@ sequenceDiagram
   ```solidity
   mapping(bytes32 => mapping(address => bool)) public signers;
   ```
+- `signerList`: `bytes32` (データのハッシュ値) をキーとし、署名したアドレスのリスト (`address[]`) を値とするマッピング。フロントエンドでの一覧表示に利用する。
+  ```solidity
+  mapping(bytes32 => address[]) public signerList;
+  ```
 
 ### 3.2. イベント (Events)
 - `RecordStored`: 新しいデータハッシュが記録された際に放出される。
@@ -80,6 +84,7 @@ sequenceDiagram
     - `ecrecover` を用いて `signature` から署名者のアドレスを復元する。
     - 復元したアドレスが `address(0)` でないこと、かつ `signers[dataHash][recoveredAddress]` が `false` である（未署名である）ことを確認する。
     - `signers[dataHash][recoveredAddress]` を `true` に設定する。
+    - `signerList[dataHash]` に復元したアドレスを追加する。
     - `SignatureAdded` イベントを放出する。
 
 - `getOwner(bytes32 dataHash) returns (address)`:
@@ -88,6 +93,10 @@ sequenceDiagram
 
 - `hasSigned(bytes32 dataHash, address signer) returns (bool)`:
   - **責務:** 指定されたハッシュ値に対して、特定のアドレスが署名したかを確認する。
+  - **種別:** `view`
+
+- `getSigners(bytes32 dataHash) returns (address[] memory)`:
+  - **責務:** 指定されたハッシュ値に紐づくすべての署名者アドレスのリストを取得する。
   - **種別:** `view`
 
 ## 4. Webフロントエンド設計

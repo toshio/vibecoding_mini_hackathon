@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "predev": "cp -p hardhat/artifacts/contracts/FileAuthenticityVerification.sol/FileAuthenticityVerification.json app/abi/ || true",
     "dev": "next dev",
     "build": "next build",
     "start": "next start",

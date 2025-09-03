@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import dynamic from 'next/dynamic';
-import { useReadContract } from "wagmi";
+import { useAccount, useReadContract } from "wagmi";
 import contract from "./abi/FileAuthenticityVerification.json";
 import FileHasher from "./components/FileHasher";
 import RecordButton from "./components/RecordButton";
@@ -11,15 +11,17 @@ import SignButton from "./components/SignButton";
 
 const Header = dynamic(() => import('./components/Header'), { ssr: false });
 
-const CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS;
+const CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS as `0x${string}` | undefined;
 
 export default function Page() {
-  const [calculatedHash, setCalculatedHash] = useState<string | null>(null);
+  const [calculatedHash, setCalculatedHash] = useState<`0x${string}` | null>(null);
   const [txHash, setTxHash] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
+  const { address: connectedAddress } = useAccount();
+
   const { data: owner, isLoading: isOwnerLoading, error: ownerError } = useReadContract({
-    address: CONTRACT_ADDRESS as `0x${string}` | undefined,
+    address: CONTRACT_ADDRESS,
     abi: contract.abi,
     functionName: 'getOwner',
     args: calculatedHash ? [calculatedHash] : undefined,
@@ -27,6 +29,22 @@ export default function Page() {
       enabled: !!calculatedHash,
     },
   });
+
+  const { data: signers, isLoading: isLoadingSigners, error: errorSigners } = useReadContract({
+    address: CONTRACT_ADDRESS,
+    abi: contract.abi,
+    functionName: 'getSigners',
+    args: calculatedHash ? [calculatedHash] : undefined,
+    query: {
+      enabled: !!calculatedHash && !!owner && owner !== '0x0000000000000000000000000000000000000000',
+    },
+  });
+
+  useEffect(() => {
+    if (errorSigners) {
+      console.error("Detailed Verifier Error:", errorSigners);
+    }
+  }, [errorSigners]);
 
   const handleSuccess = (hash: string) => {
     setTxHash(hash);
@@ -38,10 +56,25 @@ export default function Page() {
     setTxHash(null);
   };
 
-  const handleHashCalculated = (hash: string) => {
+  const handleHashCalculated = (hash: `0x${string}`) => {
     setCalculatedHash(hash);
     setTxHash(null);
     setError(null);
+  }
+
+  const isOwnerFound = owner && owner !== '0x0000000000000000000000000000000000000000';
+  const verifiers = signers as (`0x${string}`[]) | undefined;
+  const hasUserSigned = verifiers?.some(verifier => verifier.toLowerCase() === connectedAddress?.toLowerCase());
+
+  const isRecordButtonHidden = isOwnerFound;
+  
+  let signButtonState: 'enabled' | 'is_owner' | 'already_verified' | 'no_owner' = 'enabled';
+  if (!isOwnerFound) {
+    signButtonState = 'no_owner';
+  } else if (owner === connectedAddress) {
+    signButtonState = 'is_owner';
+  } else if (hasUserSigned) {
+    signButtonState = 'already_verified';
   }
 
   return (
@@ -63,9 +96,25 @@ export default function Page() {
               <p className="text-lg font-mono break-all">{calculatedHash}</p>
             </div>
           )}
-          <VerificationDisplay hash={calculatedHash} owner={owner as string | null | undefined} isLoading={isOwnerLoading} error={ownerError} />
-          <RecordButton hash={calculatedHash} onSuccess={handleSuccess} onError={handleError} />
-          <SignButton hash={calculatedHash} owner={owner as string | null | undefined} onSuccess={handleSuccess} onError={handleError} />
+          <VerificationDisplay 
+            hash={calculatedHash} 
+            owner={owner} 
+            signers={verifiers} 
+            isLoading={isOwnerLoading} 
+            isLoadingSigners={isLoadingSigners} 
+            error={ownerError} 
+            errorSigners={errorSigners} 
+          />
+          {!isRecordButtonHidden && (
+            <RecordButton hash={calculatedHash} onSuccess={handleSuccess} onError={handleError} />
+          )}
+          <SignButton 
+            hash={calculatedHash} 
+            owner={owner} 
+            onSuccess={handleSuccess} 
+            onError={handleError} 
+            status={signButtonState}
+          />
           {txHash && (
             <div className="mt-6 p-4 bg-green-900 rounded-lg text-center">
               <p className="text-green-300">Success! Transaction Hash:</p>
