@@ -1,116 +1,93 @@
 "use client";
 
-import {
-  useMiniKit,
-  useAddFrame,
-  useOpenUrl,
-} from "@coinbase/onchainkit/minikit";
-import {
-  Name,
-  Identity,
-  Address,
-  Avatar,
-  EthBalance,
-} from "@coinbase/onchainkit/identity";
-import {
-  ConnectWallet,
-  Wallet,
-  WalletDropdown,
-  WalletDropdownDisconnect,
-} from "@coinbase/onchainkit/wallet";
-import { useEffect, useMemo, useState, useCallback } from "react";
-import { Button } from "./components/DemoComponents";
-import { Icon } from "./components/DemoComponents";
-import { Home } from "./components/DemoComponents";
-import { Features } from "./components/DemoComponents";
+import { useState } from "react";
+import dynamic from 'next/dynamic';
+import { useReadContract } from "wagmi";
+import contract from "./abi/FileAuthenticityVerification.json";
+import FileHasher from "./components/FileHasher";
+import RecordButton from "./components/RecordButton";
+import VerificationDisplay from "./components/VerificationDisplay";
+import SignButton from "./components/SignButton";
 
-export default function App() {
-  const { setFrameReady, isFrameReady, context } = useMiniKit();
-  const [frameAdded, setFrameAdded] = useState(false);
-  const [activeTab, setActiveTab] = useState("home");
+const Header = dynamic(() => import('./components/Header'), { ssr: false });
 
-  const addFrame = useAddFrame();
-  const openUrl = useOpenUrl();
+const CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS;
 
-  useEffect(() => {
-    if (!isFrameReady) {
-      setFrameReady();
-    }
-  }, [setFrameReady, isFrameReady]);
+export default function Page() {
+  const [calculatedHash, setCalculatedHash] = useState<string | null>(null);
+  const [txHash, setTxHash] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleAddFrame = useCallback(async () => {
-    const frameAdded = await addFrame();
-    setFrameAdded(Boolean(frameAdded));
-  }, [addFrame]);
+  const { data: owner, isLoading: isOwnerLoading, error: ownerError } = useReadContract({
+    address: CONTRACT_ADDRESS as `0x${string}` | undefined,
+    abi: contract.abi,
+    functionName: 'getOwner',
+    args: calculatedHash ? [calculatedHash] : undefined,
+    query: {
+      enabled: !!calculatedHash,
+    },
+  });
 
-  const saveFrameButton = useMemo(() => {
-    if (context && !context.client.added) {
-      return (
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={handleAddFrame}
-          className="text-[var(--app-accent)] p-4"
-          icon={<Icon name="plus" size="sm" />}
-        >
-          Save Frame
-        </Button>
-      );
-    }
+  const handleSuccess = (hash: string) => {
+    setTxHash(hash);
+    setError(null);
+  };
 
-    if (frameAdded) {
-      return (
-        <div className="flex items-center space-x-1 text-sm font-medium text-[#0052FF] animate-fade-out">
-          <Icon name="check" size="sm" className="text-[#0052FF]" />
-          <span>Saved</span>
-        </div>
-      );
-    }
+  const handleError = (errorMessage: string) => {
+    setError(errorMessage);
+    setTxHash(null);
+  };
 
-    return null;
-  }, [context, frameAdded, handleAddFrame]);
+  const handleHashCalculated = (hash: string) => {
+    setCalculatedHash(hash);
+    setTxHash(null);
+    setError(null);
+  }
 
   return (
-    <div className="flex flex-col min-h-screen font-sans text-[var(--app-foreground)] mini-app-theme from-[var(--app-background)] to-[var(--app-gray)]">
-      <div className="w-full max-w-md mx-auto px-4 py-3">
-        <header className="flex justify-between items-center mb-3 h-11">
-          <div>
-            <div className="flex items-center space-x-2">
-              <Wallet className="z-10">
-                <ConnectWallet>
-                  <Name className="text-inherit" />
-                </ConnectWallet>
-                <WalletDropdown>
-                  <Identity className="px-4 pt-3 pb-2" hasCopyAddressOnClick>
-                    <Avatar />
-                    <Name />
-                    <Address />
-                    <EthBalance />
-                  </Identity>
-                  <WalletDropdownDisconnect />
-                </WalletDropdown>
-              </Wallet>
+    <div className="flex flex-col justify-center items-center min-h-screen bg-gray-900 text-white">
+      <Header />
+      <main className="flex flex-col items-center justify-center flex-1 p-24">
+        <h1 className="text-5xl font-bold mb-8">
+          File Authenticity Verification on Base
+        </h1>
+        <p className="text-xl text-gray-400 mb-12">
+          Your files, verified and secured on the blockchain.
+        </p>
+        
+        <div className="w-full max-w-2xl">
+          <FileHasher onHashCalculated={handleHashCalculated} />
+          {calculatedHash && (
+            <div className="mt-6 p-4 bg-gray-800 rounded-lg text-center">
+              <p className="text-gray-300">Calculated SHA-256 Hash:</p>
+              <p className="text-lg font-mono break-all">{calculatedHash}</p>
             </div>
-          </div>
-          <div>{saveFrameButton}</div>
-        </header>
+          )}
+          <VerificationDisplay hash={calculatedHash} owner={owner as string | null | undefined} isLoading={isOwnerLoading} error={ownerError} />
+          <RecordButton hash={calculatedHash} onSuccess={handleSuccess} onError={handleError} />
+          <SignButton hash={calculatedHash} owner={owner as string | null | undefined} onSuccess={handleSuccess} onError={handleError} />
+          {txHash && (
+            <div className="mt-6 p-4 bg-green-900 rounded-lg text-center">
+              <p className="text-green-300">Success! Transaction Hash:</p>
+              <a 
+                href={`https://sepolia.basescan.org/tx/${txHash}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-sm font-mono break-all text-blue-400 hover:underline"
+              >
+                {txHash}
+              </a>
+            </div>
+          )}
+          {error && (
+            <div className="mt-6 p-4 bg-red-900 rounded-lg text-center">
+              <p className="text-red-300">Error:</p>
+              <p className="text-sm font-mono break-all">{error}</p>
+            </div>
+          )}
+        </div>
 
-        <main className="flex-1">
-          {activeTab === "home" && <Home setActiveTab={setActiveTab} />}
-          {activeTab === "features" && <Features setActiveTab={setActiveTab} />}
-        </main>
-
-        <footer className="mt-2 pt-4 flex justify-center">
-          <Button
-            variant="ghost"
-            size="sm"
-            className="text-[var(--ock-text-foreground-muted)] text-xs"
-            onClick={() => openUrl("https://base.org/builders/minikit")}
-          >
-            Built on Base with MiniKit
-          </Button>
-        </footer>
-      </div>
+      </main>
     </div>
   );
 }
