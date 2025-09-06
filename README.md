@@ -4,7 +4,9 @@
 
 本リポジトリは、2025年8月30日(土)～9月7日(日)にわたって開催された[Vibe Coding Mini Hackathon](https://luma.com/78zf6krs?tk=6awaFl)に参加させていただき、自分では一切コードを書かずに、AI (Gemini CLI)を用いて[BaseChain](https://www.base.org/)を利用するアプリケーションをつくることにチャレンジした記録です。
 
-私個人は『個人や家族の大切なデータを100年後、200年後という遠い未来にまで遺していく』ことを実現するための仕組みづくりに関心があり、その中で考えるべき課題の一つとして『データの真正性』があります。Blockchainを用いたデータの真正性の担保は、真新しいアイデアというわけではありませんが、今までEVM系のBlockchainを使ってアプリケーションを開発した経験はなく、Vibe Codingを通じて学んでいけるよい機会と捉えPoCの実装を行いました。
+私個人は『個人や家族の大切なデータを100年後、200年後という遠い未来にまで遺していく』ことを実現するための仕組みづくりに関心を持っています。その中で考えるべき課題の一つに『データの真正性』があります。
+
+Blockchainを用いたデータ真正性の検証は、これといって真新しいアイデアというわけではありませんが、今までEVM系のBlockchainを使ってアプリケーションを開発した経験はなく、今回のHackathonはVibe Codingを通じて学んでいける素晴らしい機会と捉えPoCの実装を行いました。
 
 8月30日(土)のHackathonのキックオフをはじめ第一線でご活躍されている方々からVibe CodingやBaseChainなどたくさんのことを教えていただき、心より感謝申し上げます。
 
@@ -22,7 +24,7 @@ sha256ハッシュ値のみだといつか衝突する可能性はあります�
 
 ## 画面イメージ
 
-![](devlogs/2025-09-07_Presentation/FileAuthenticityVerification.jpg)
+![](devlogs/images/FileAuthenticityVerification.jpg)
 
 ※Base Mini Appへの対応は時間の都合で断念しました。
 
@@ -89,10 +91,7 @@ $ npm run dev
 
 ```
 $ cd hardhat
-$ npm instlall
-```
-
-```
+$ npm install
 $ npm run compile
 $ npm run test
 ```
@@ -112,3 +111,14 @@ $ npm run deploy
 ︙
 FileAuthenticityVerification deployed to: 0x…
 ```
+
+## 開発記録
+
+| Date             | Title                                                                                                                    |
+| :--------------- | :----------------------------------------------------------------------------------------------------------------------- |
+| 2025-08-30 (Sat) | [キックオフ参加](https://github.com/toshio/vibecoding_mini_hackathon/blob/main/devlogs/2025-08-30_Hackathon.md)          |
+| 2025-08-31 (Sun) | [アイデア検討](https://github.com/toshio/vibecoding_mini_hackathon/blob/main/devlogs/2025-08-31_Gemini.md)               |
+| 2025-09-03 (Wed) | [Frontend開発](https://github.com/toshio/vibecoding_mini_hackathon/blob/main/devlogs/2025-09-03_Frontend.md)             |
+| 2025-09-04 (Thu) | [仕様確認](https://github.com/toshio/vibecoding_mini_hackathon/blob/main/devlogs/2025-09-04_Specification.md)            |
+| 2025-09-05 (Fri) | [Facaster検討](https://github.com/toshio/vibecoding_mini_hackathon/blob/main/devlogs/2025-09-05_Facaster.md)             |
+| 2025-09-06 (Sat) | [Smart Contract実装確認](https://github.com/toshio/vibecoding_mini_hackathon/blob/main/devlogs/2025-09-06_Deployment.md) |

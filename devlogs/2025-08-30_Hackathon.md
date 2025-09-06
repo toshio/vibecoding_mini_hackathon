@@ -107,4 +107,4 @@ $ npm install
 $ npm run dev
 ```
 
-![](2025-08-30_Hackathon/miniapp.jpg)
+![](images/miniapp.jpg)
