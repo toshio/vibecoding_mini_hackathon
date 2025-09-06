@@ -7,13 +7,12 @@ const CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS;
 
 type SignButtonProps = {
   hash: string | null;
-  owner: string | null | undefined;
   onSuccess: (txHash: string) => void;
   onError: (error: string) => void;
   status: 'enabled' | 'is_owner' | 'already_verified' | 'no_owner';
 };
 
-export default function SignButton({ hash, owner, onSuccess, onError, status }: SignButtonProps) {
+export default function SignButton({ hash, onSuccess, onError, status }: SignButtonProps) {
   const { signMessageAsync } = useSignMessage();
   const { writeContract, isPending } = useWriteContract();
 
@@ -40,8 +39,12 @@ export default function SignButton({ hash, owner, onSuccess, onError, status }: 
         onError: (error) => onError(error.message),
       });
 
-    } catch (error: any) {
-      onError(error.message || 'Failed to sign message.');
+    } catch (error) {
+      if (error instanceof Error) {
+        onError(error.message);
+      } else {
+        onError('An unknown error occurred during the signing process.');
+      }
     }
   };
 

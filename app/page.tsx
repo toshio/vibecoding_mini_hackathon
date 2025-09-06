@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import dynamic from 'next/dynamic';
 import { useAccount, useReadContract } from "wagmi";
-import contract from "./abi/FileAuthenticityVerification.json";
+import { fileAuthenticityVerificationAbi } from "./abi/provider";
 import FileHasher from "./components/FileHasher";
 import RecordButton from "./components/RecordButton";
 import VerificationDisplay from "./components/VerificationDisplay";
@@ -22,7 +22,7 @@ export default function Page() {
 
   const { data: owner, isLoading: isOwnerLoading, error: ownerError } = useReadContract({
     address: CONTRACT_ADDRESS,
-    abi: contract.abi,
+    abi: fileAuthenticityVerificationAbi,
     functionName: 'getOwner',
     args: calculatedHash ? [calculatedHash] : undefined,
     query: {
@@ -32,7 +32,7 @@ export default function Page() {
 
   const { data: signers, isLoading: isLoadingSigners, error: errorSigners } = useReadContract({
     address: CONTRACT_ADDRESS,
-    abi: contract.abi,
+    abi: fileAuthenticityVerificationAbi,
     functionName: 'getSigners',
     args: calculatedHash ? [calculatedHash] : undefined,
     query: {
@@ -98,7 +98,7 @@ export default function Page() {
           )}
           <VerificationDisplay 
             hash={calculatedHash} 
-            owner={owner} 
+            owner={owner as `0x${string}` | undefined} 
             signers={verifiers} 
             isLoading={isOwnerLoading} 
             isLoadingSigners={isLoadingSigners} 
@@ -110,7 +110,6 @@ export default function Page() {
           )}
           <SignButton 
             hash={calculatedHash} 
-            owner={owner} 
             onSuccess={handleSuccess} 
             onError={handleError} 
             status={signButtonState}

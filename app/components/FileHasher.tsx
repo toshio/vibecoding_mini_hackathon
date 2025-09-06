@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 
-async function calculateSHA256(file: File): Promise<string> {
+async function calculateSHA256(file: File): Promise<`0x${string}`> {
   const buffer = await file.arrayBuffer();
   const hashBuffer = await crypto.subtle.digest('SHA-256', buffer);
   const hashArray = Array.from(new Uint8Array(hashBuffer));
@@ -11,7 +11,7 @@ async function calculateSHA256(file: File): Promise<string> {
 }
 
 type FileHasherProps = {
-  onHashCalculated: (hash: string) => void;
+  onHashCalculated: (hash: `0x${string}`) => void;
 };
 
 export default function FileHasher({ onHashCalculated }: FileHasherProps) {

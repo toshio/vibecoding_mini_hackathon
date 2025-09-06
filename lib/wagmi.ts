@@ -1,23 +1,20 @@
-import { type Connector, createConfig, http } from "wagmi";
+import { createConfig, http } from "wagmi";
 import { baseSepolia } from "wagmi/chains";
 import { coinbaseWallet, injected, walletConnect } from "wagmi/connectors";
 
 const projectId = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID;
 
-// Define a base set of connectors
-const connectors: Connector[] = [
-  injected(),
-  coinbaseWallet({ appName: "File Authenticity Verification" }),
-];
-
-// Add WalletConnect only if a project ID is provided
-if (projectId) {
-  connectors.push(walletConnect({ projectId }));
-}
-
+// The connectors array is now defined directly inside createConfig.
+// A conditional spread `...(projectId ? [walletConnect(...)] : [])` is used
+// to include WalletConnect only if a projectId is available.
+// This approach allows TypeScript to correctly infer the union type of all possible connectors at once.
 export const wagmiConfig = createConfig({
   chains: [baseSepolia],
-  connectors,
+  connectors: [
+    injected(),
+    coinbaseWallet({ appName: "File Authenticity Verification" }),
+    ...(projectId ? [walletConnect({ projectId })] : []),
+  ],
   transports: {
     [baseSepolia.id]: http(),
   },
