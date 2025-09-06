@@ -112,13 +112,19 @@ $ npm run deploy
 FileAuthenticityVerification deployed to: 0x…
 ```
 
+## ドキュメント
+
+- [要件定義書 (docs/requirements.md)](docs/requirements.md)
+- [設計書 (docs/design.md)](docs/design.md)
+- [開発タスクリスト (docs/tasks.md)](docs/tasks.md)
+
 ## 開発記録
 
-| Date             | Title                                                                                                                    |
-| :--------------- | :----------------------------------------------------------------------------------------------------------------------- |
-| 2025-08-30 (Sat) | [キックオフ参加](https://github.com/toshio/vibecoding_mini_hackathon/blob/main/devlogs/2025-08-30_Hackathon.md)          |
-| 2025-08-31 (Sun) | [アイデア検討](https://github.com/toshio/vibecoding_mini_hackathon/blob/main/devlogs/2025-08-31_Gemini.md)               |
-| 2025-09-03 (Wed) | [Frontend開発](https://github.com/toshio/vibecoding_mini_hackathon/blob/main/devlogs/2025-09-03_Frontend.md)             |
-| 2025-09-04 (Thu) | [仕様確認](https://github.com/toshio/vibecoding_mini_hackathon/blob/main/devlogs/2025-09-04_Specification.md)            |
-| 2025-09-05 (Fri) | [Facaster検討](https://github.com/toshio/vibecoding_mini_hackathon/blob/main/devlogs/2025-09-05_Facaster.md)             |
-| 2025-09-06 (Sat) | [Smart Contract実装確認](https://github.com/toshio/vibecoding_mini_hackathon/blob/main/devlogs/2025-09-06_Deployment.md) |
+| Date             | Title                                                      |
+| :--------------- | :--------------------------------------------------------- |
+| 2025-08-30 (Sat) | [キックオフ参加](devlogs/2025-08-30_Hackathon.md)          |
+| 2025-08-31 (Sun) | [アイデア検討](devlogs/2025-08-31_Gemini.md)               |
+| 2025-09-03 (Wed) | [Frontend開発](devlogs/2025-09-03_Frontend.md)             |
+| 2025-09-04 (Thu) | [仕様確認](devlogs/2025-09-04_Specification.md)            |
+| 2025-09-05 (Fri) | [Facaster検討](devlogs/2025-09-05_Facaster.md)             |
+| 2025-09-06 (Sat) | [Smart Contract実装確認](devlogs/2025-09-06_Deployment.md) |
