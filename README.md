@@ -1,91 +1,114 @@
-# MiniKit Template
+# File Authenticity Verification
 
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-onchain --mini`](), configured with:
+## 概要
 
-- [MiniKit](https://docs.base.org/builderkits/minikit/overview)
-- [OnchainKit](https://www.base.org/builders/onchainkit)
-- [Tailwind CSS](https://tailwindcss.com)
-- [Next.js](https://nextjs.org/docs)
+本リポジトリは、2025年8月30日(土)～9月7日(日)にわたって開催された[Vibe Coding Mini Hackathon](https://luma.com/78zf6krs?tk=6awaFl)に参加させていただき、自分では一切コードを書かずに、AI (Gemini CLI)を用いて[BaseChain](https://www.base.org/)を利用するアプリケーションをつくることにチャレンジした記録です。
 
-## Getting Started
+私個人は『個人や家族の大切なデータを100年後、200年後という遠い未来にまで遺していく』ことを実現するための仕組みづくりに関心があり、その中で考えるべき課題の一つとして『データの真正性』があります。Blockchainを用いたデータの真正性の担保は、真新しいアイデアというわけではありませんが、今までEVM系のBlockchainを使ってアプリケーションを開発した経験はなく、Vibe Codingを通じて学んでいけるよい機会と捉えPoCの実装を行いました。
 
-1. Install dependencies:
-```bash
-npm install
-# or
-yarn install
-# or
-pnpm install
-# or
-bun install
+8月30日(土)のHackathonのキックオフをはじめ第一線でご活躍されている方々からVibe CodingやBaseChainなどたくさんのことを教えていただき、心より感謝申し上げます。
+
+## アプリケーション
+
+以下の機能を持つシンプルなアプリケーションを提供します。
+
+- 任意のファイルをWebブラウザから読み込んで、そのsha256ハッシュ値をBase SepoliaのBlockchainに記録します。（ファイルの内容はアップロードされません）
+- そのファイル（のsha256ハッシュ値）に対して第三者署名を行い、その結果をBlockchainに記録します。
+- そのファイルの所有者および署名者の情報をBlockchainから照会できます。
+
+ハッシュ値や署名をBlockchainへ登録するためにBase SepoliaのGas代が必要となります。
+
+sha256ハッシュ値のみだといつか衝突する可能性はありますので、実際の運用を考える場合、ファイルのサイズや日付等のメタデータも考慮する必要があるのかもしれませんが、今回はあくまでもVibe Codingで実装することが目的ですので仕組みを単純化しています。
+
+## 画面イメージ
+
+![](devlogs/2025-09-07_Presentation/FileAuthenticityVerification.jpg)
+
+※Base Mini Appへの対応は時間の都合で断念しました。
+
+## シーケンス
+
+```mermaid
+sequenceDiagram
+    participant User as ユーザー
+    participant Frontend as Webアプリケーション
+    participant Wallet as ウォレット
+    participant SmartContract as 真贋証明コントラクト (BaseChain)
+
+    Note over User, SmartContract: データ記録プロセス
+    User->>Frontend: 1. ファイルを選択
+    Frontend->>Frontend: 2. ファイルのハッシュ値(dataHash)を計算
+    Frontend->>Wallet: 3. トランザクションを要求 (storeHash)
+    Wallet-->>User: トランザクションを確認・署名
+    User-->>Wallet: 承認
+    Wallet->>SmartContract: 4. storeHash(dataHash) を実行
+    SmartContract-->>SmartContract: 5. 所有者(msg.sender)とハッシュを記録
+    SmartContract-->>Frontend: 6. 記録完了
+    Frontend-->>User: 7. UIに完了を表示
+
+    Note over User, SmartContract: 第三者署名プロセス
+    User->>Frontend: 1. 署名対象のハッシュ値を入力
+    Frontend->>Wallet: 2. 署名を要求 (対象: dataHash)
+    Wallet-->>User: 署名を確認
+    User-->>Wallet: 承認
+    Wallet->>Frontend: 3. 署名(signature)を返す
+    Frontend->>Wallet: 4. トランザクションを要求 (addSignature)
+    Wallet-->>User: トランザクションを確認・署名
+    User-->>Wallet: 承認
+    Wallet->>SmartContract: 5. addSignature(dataHash, signature) を実行
+    SmartContract-->>SmartContract: 6. 署名者アドレスを復元・記録
+    SmartContract-->>Frontend: 7. 署名完了
+    Frontend-->>User: 8. UIに完了を表示
 ```
 
-2. Verify environment variables, these will be set up by the `npx create-onchain --mini` command:
+## デプロイ手順
 
-You can regenerate the FARCASTER Account Association environment variables by running `npx create-onchain --manifest` in your project directory.
-
-The environment variables enable the following features:
-
-- Frame metadata - Sets up the Frame Embed that will be shown when you cast your frame
-- Account association - Allows users to add your frame to their account, enables notifications
-- Redis API keys - Enable Webhooks and background notifications for your application by storing users notification details
-
-```bash
-NEXT_PUBLIC_URL=
-NEXT_PUBLIC_ONCHAINKIT_API_KEY=
-NEXT_PUBLIC_CONTRACT_ADDRESS=
-FARCASTER_FID=
+```
+$ git clone https://github.com/toshio/vibecoding_mini_hackathon.git
+$ cd vibecoding_mini_hackathon/
+$ npm install
 ```
 
-3. Start the development server:
-```bash
-npm run dev
+### .envファイルの作成
+
+[`.env.sample`](https://github.com/toshio/vibecoding_mini_hackathon/blob/main/.env.sample)の内容をベースに、少なくとも以下の項目を設定した`.env`を作成します。
+
+| 項目                         | 概要                   | 備考                                                 |
+| :--------------------------- | :--------------------- | :--------------------------------------------------- |
+| NEXT_PUBLIC_CONTRACT_ADDRESS | Smart Contractアドレス | 『Smart Contractのビルド・デプロイを行う場合』を参照 |
+
+### Webサーバの起動
+
+```
+$ npm run dev
 ```
 
-## Template Features
+## Smart Contractのビルド・デプロイを行う場合
 
-### Frame Configuration
-- `.well-known/farcaster.json` endpoint configured for Frame metadata and account association
-- Frame metadata automatically added to page headers in `layout.tsx`
+### コンパイル & テスト
 
-### Background Notifications
-- Redis-backed notification system using Upstash
-- Ready-to-use notification endpoints in `api/notify` and `api/webhook`
-- Notification client utilities in `lib/notification-client.ts`
+```
+$ cd hardhat
+$ npm instlall
+```
 
-### Theming
-- Custom theme defined in `theme.css` with OnchainKit variables
-- Pixel font integration with Pixelify Sans
-- Dark/light mode support through OnchainKit
+```
+$ npm run compile
+$ npm run test
+```
 
-### MiniKit Provider
-The app is wrapped with `MiniKitProvider` in `providers.tsx`, configured with:
-- OnchainKit integration
-- Access to Frames context
-- Sets up Wagmi Connectors
-- Sets up Frame SDK listeners
-- Applies Safe Area Insets
+### hardhat/.envファイルの作成
 
-## Customization
+[hardhat/.env.sample](https://github.com/toshio/vibecoding_mini_hackathon/blob/main/hardhat/.env.sample)の内容をベースに、以下の項目を設定した`hardhat/.env`を作成します。
 
-To get started building your own frame, follow these steps:
+| 項目        | 概要                                     | 備考 |
+| :---------- | :--------------------------------------- | :--- |
+| PRIVATE_KEY | Smart Contractをデプロイするための秘密鍵 | 0x…  |
 
-1. Remove the DemoComponents:
-   - Delete `components/DemoComponents.tsx`
-   - Remove demo-related imports from `page.tsx`
+### Smart Contractのデプロイ
 
-2. Start building your Frame:
-   - Modify `page.tsx` to create your Frame UI
-   - Update theme variables in `theme.css`
-   - Adjust MiniKit configuration in `providers.tsx`
-
-3. Add your frame to your account:
-   - Cast your frame to see it in action
-   - Share your frame with others to start building your community
-
-## Learn More
-
-- [MiniKit Documentation](https://docs.base.org/builderkits/minikit/overview)
-- [OnchainKit Documentation](https://docs.base.org/builderkits/onchainkit/getting-started)
-- [Next.js Documentation](https://nextjs.org/docs)
-- [Tailwind CSS Documentation](https://tailwindcss.com/docs)
+```
+$ npm run deploy
+︙
+FileAuthenticityVerification deployed to: 0x…
+```
