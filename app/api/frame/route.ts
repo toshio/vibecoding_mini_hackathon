@@ -13,7 +13,7 @@ const publicClient = createPublicClient({
 });
 
 async function getResponse(req: NextRequest): Promise<NextResponse> {
-  const NEXT_PUBLIC_HOST_URL = process.env.NEXT_PUBLIC_HOST_URL || 'http://localhost:3000';
+  const NEXT_PUBLIC_URL = process.env.NEXT_PUBLIC_URL;
   const body = await req.json();
 
   const { message, isValid } = await getFrameMessage(body);
@@ -34,9 +34,9 @@ async function getResponse(req: NextRequest): Promise<NextResponse> {
            <title>Invalid Hash</title>
            <meta property="og:title" content="Invalid Hash" />
            <meta property="fc:frame" content="vNext" />
-           <meta property="fc:frame:image" content="${NEXT_PUBLIC_HOST_URL}/hero.png" />
+           <meta property="fc:frame:image" content="${NEXT_PUBLIC_URL}/hero.png" />
            <meta property="fc:frame:button:1" content="無効なハッシュです。もう一度試す" />
-           <meta property="fc:frame:post_url" content="${NEXT_PUBLIC_HOST_URL}/api/frame" />
+           <meta property="fc:frame:post_url" content="${NEXT_PUBLIC_URL}/api/frame" />
          </head></html>`);
     }
     
@@ -57,12 +57,12 @@ async function getResponse(req: NextRequest): Promise<NextResponse> {
             <title>Hash Found</title>
             <meta property="og:title" content="Hash Found" />
             <meta property="fc:frame" content="vNext" />
-            <meta property="fc:frame:image" content="${NEXT_PUBLIC_HOST_URL}/screenshot.png" />
+            <meta property="fc:frame:image" content="${NEXT_PUBLIC_URL}/screenshot.png" />
             <meta property="fc:frame:button:1" content="オーナー: ${getAddress(owner as string).slice(0, 10)}..." />
             <meta property="fc:frame:button:1:action" content="link" />
             <meta property="fc:frame:button:1:target" content="https://sepolia.basescan.org/address/${owner}" />
             <meta property="fc:frame:button:2" content="もう一度試す" />
-            <meta property="fc:frame:post_url" content="${NEXT_PUBLIC_HOST_URL}/api/frame" />
+            <meta property="fc:frame:post_url" content="${NEXT_PUBLIC_URL}/api/frame" />
           </head></html>`);
       } else {
         // Hash not found
@@ -71,10 +71,10 @@ async function getResponse(req: NextRequest): Promise<NextResponse> {
             <title>Hash Not Found</title>
             <meta property="og:title" content="Hash Not Found" />
             <meta property="fc:frame" content="vNext" />
-            <meta property="fc:frame:image" content="${NEXT_PUBLIC_HOST_URL}/hero.png" />
+            <meta property="fc:frame:image" content="${NEXT_PUBLIC_URL}/hero.png" />
             <meta property="fc:frame:button:1" content="このハッシュは記録されていません" />
             <meta property="fc:frame:button:2" content="もう一度試す" />
-            <meta property="fc:frame:post_url" content="${NEXT_PUBLIC_HOST_URL}/api/frame" />
+            <meta property="fc:frame:post_url" content="${NEXT_PUBLIC_URL}/api/frame" />
           </head></html>`);
       }
     } catch (err) {
@@ -91,10 +91,10 @@ async function getResponse(req: NextRequest): Promise<NextResponse> {
           <title>Enter Hash</title>
           <meta property="og:title" content="Enter Hash" />
           <meta property="fc:frame" content="vNext" />
-          <meta property="fc:frame:image" content="${NEXT_PUBLIC_HOST_URL}/screenshot.png" />
+          <meta property="fc:frame:image" content="${NEXT_PUBLIC_URL}/screenshot.png" />
           <meta property="fc:frame:input:text" content="ここにファイルハッシュを入力..." />
           <meta property="fc:frame:button:1" content="このハッシュを検証" />
-          <meta property="fc:frame:post_url" content="${NEXT_PUBLIC_HOST_URL}/api/frame?action=verify" />
+          <meta property="fc:frame:post_url" content="${NEXT_PUBLIC_URL}/api/frame?action=verify" />
         </head></html>`);
     }
     return new NextResponse('Invalid action', { status: 400 });
